@@ -92,7 +92,7 @@ function CardDetail({ name, cardId }) {
         >
           {
             checkList.map(({id, name})=>(
-                <CheckList key={id} name={name} checkListId={id} onDeleteChecklist={handleDeleteCheckList}></CheckList>
+                <CheckList key={id} name={name} checkListId={id} cardId={cardId} onDeleteChecklist={handleDeleteCheckList}></CheckList>
             ))
           }
         </Box>

@@ -2,15 +2,16 @@ import { Box, Button, Checkbox, FormGroup } from '@mui/material';
 import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import { useEffect, useState } from 'react';
-import { deleteApiData, getApiData, postApiData } from '../../ApiConfig/Api';
+import { archiveApiData, deleteApiData, getApiData, postApiData } from '../../ApiConfig/Api';
 import EditInput from '../EditInput/EditInput';
 import ProgressBar from '../ProgressBar/ProgressBar.jsx';
 
-function CheckList({ name, checkListId, onDeleteChecklist }) {
+function CheckList({ name, checkListId, cardId,onDeleteChecklist }) {
   const [checkItem, setCheckItem] = useState([]);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  console.log(cardId,checkListId)
 
   useEffect(() => {
     getApiData(
@@ -62,6 +63,23 @@ function CheckList({ name, checkListId, onDeleteChecklist }) {
 
     return Math.floor(((count / checkItem.length) * 100).toFixed(2));
   };
+
+
+  const handleChange = async(checkItemId, state,name)=>{
+    const checkboxState = state === 'complete' ? 'incomplete' : 'complete';
+// console.log(checkItemId, name,checkboxState)
+    const res = await archiveApiData(`/cards/${cardId}/checkItem/${checkItemId}?state=${checkboxState}`)
+    setCheckItem((data)=>{
+        const newData = data.map((obj)=>{
+            if(obj.id === res.id){
+                obj.state = checkboxState
+            }
+            return obj
+        })  
+        return newData
+    })
+
+  }
 
   if (error) {
     return <>Error</>;
@@ -159,6 +177,7 @@ function CheckList({ name, checkListId, onDeleteChecklist }) {
                     size="small"
                     sx={{ color: 'white' }}
                     color="default"
+                    onChange={()=>(handleChange(id, state,name))}
                   />
                 </Box>
                 <Box
