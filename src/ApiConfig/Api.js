@@ -34,5 +34,19 @@ const archiveApiData = async(url)=>{
         console.log({error:{...error}})
     }
 }
+const deleteApiData = async(url,setData, checkListId)=>{
+    try {
+        const response = await api.delete(url)
+        // console.log(response)
+        if(response){
+            setData((data)=>{
+                const newdata = data.filter(({id})=>id !==checkListId)
+                return newdata;
+            })
+        }
+    } catch (error) {
+        alert("error occurred")
+    }
+}
 
-export {getApiData, postApiData,archiveApiData}
+export {getApiData, postApiData,archiveApiData,deleteApiData}

@@ -6,7 +6,7 @@ function CreateBoard({ handleCreateBoard, open }) {
   let userInput = '';
 
   return (
-    <Box>
+    <Box sx={{backgroundColor:"rgb(81, 79, 79)", padding:"1rem", borderRadius:"0.5rem"}}>
       <Box
         className="heading"
         sx={{ textAlign: 'center', color: 'white', marginBottom: '1rem' }}

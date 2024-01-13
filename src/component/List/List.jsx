@@ -1,6 +1,6 @@
 import { Box, Button } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { getApiData, postApiData } from '../../ApiConfig/Api';
+import { archiveApiData, getApiData, postApiData } from '../../ApiConfig/Api';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Card from '../Card/Card';
 import EditInput from '../EditInput/EditInput';
@@ -32,6 +32,11 @@ function List({ listId, name, handleArchive }) {
     setCards((data) => [...data, res]);
   };
 
+  const handleDeleteCard = async(cardId)=>{
+    const res =await archiveApiData(`/cards/${cardId}?closed=true`)
+    const newData = cards.filter(({id})=>id !== cardId)
+    setCards(newData)
+  }
   if (error) {
     return <>error</>;
   }
@@ -57,6 +62,7 @@ function List({ listId, name, handleArchive }) {
           justifyContent: 'space-between',
           alignItems: 'center',
           gap: '0.2rem',
+          borderBottom:"1px solid rgba(255,255,255,0.3)"
         }}
       >
         <Box
@@ -91,7 +97,7 @@ function List({ listId, name, handleArchive }) {
         </Box>
       </Box>
       <Box
-        border={'1px solid green'}
+       
         sx={{
           maxHeight: '60vh',
           overflowY: 'scroll',
@@ -103,7 +109,7 @@ function List({ listId, name, handleArchive }) {
         }}
       >
         {cards.map(({ id, name }) => (
-          <Card key={id} name={name}></Card>
+          <Card key={id} name={name} cardId={id} handleDelete={handleDeleteCard}></Card>
         ))}
       </Box>
       <Box my={1}>

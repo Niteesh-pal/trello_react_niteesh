@@ -6,7 +6,7 @@ function OpenModal({ handleClose, open, children }) {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    bgcolor: 'rgb(81, 79, 79)',
+    bgcolor: 'transparent',
     borderRadius:"0.5rem",
     border:"none",
     outline:"none",
@@ -25,8 +25,9 @@ function OpenModal({ handleClose, open, children }) {
           <Box
             sx={{
               position: 'absolute',
-              top: '0px',
-              right: '0px',
+              top: '20px',
+              right: '20px',
+              zIndex:5,
               margin: '0.5rem',
               color:"white",
               padding: '0.3rem 0.8rem',

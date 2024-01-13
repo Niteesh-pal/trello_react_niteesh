@@ -17,7 +17,7 @@ function EditInput({ handleClose, handleAdd, title }) {
         onSubmit={(e) => {
           e.preventDefault();
           handleClose();
-          handleAdd(userInput);
+          handleAdd(userInput.trim());
         }}
       >
         <TextField

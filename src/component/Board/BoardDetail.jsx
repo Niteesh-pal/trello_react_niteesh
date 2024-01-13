@@ -81,7 +81,8 @@ function BoardDetail() {
         {openAddList ? (
           <Box
             sx={{
-              width: '15rem',
+              border:"1px solid red",
+              width: '25rem',
               height: 'fit-content',
               padding: '0.5rem',
               backgroundColor: 'rgba(255,255,255,0.5)',

@@ -17,7 +17,7 @@ function Board() {
     getApiData('/members/me/boards', setBoards, setLoading, setError);
   }, []);
 
-  console.log(boards);
+  // console.log(boards);
 
   const handleOpen = () => setOpen(true);
 
