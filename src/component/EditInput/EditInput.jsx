@@ -1,7 +1,8 @@
-import { Box, Button, Popover, TextField } from '@mui/material';
+/* eslint-disable react/prop-types */
+import { Box, Button, TextField } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
-function EditInput({ handleClose, handleAdd, title }) {
+function EditInput({ handleClose, handleAdd, title, buttonName = 'Add' }) {
   let userInput = '';
   return (
     <div>
@@ -53,13 +54,13 @@ function EditInput({ handleClose, handleAdd, title }) {
               padding: '0.4rem 0.5rem',
               marginRight: '0.2rem',
               backgroundColor: '#579dff',
-              color: 'black',
+              color: 'white',
               '&:hover': {
                 backgroundColor: '#69a5fa',
               },
             }}
           >
-            Add card
+            {buttonName}
           </Button>
           <Box
             sx={{

@@ -1,23 +1,24 @@
-import { Box, Button } from '@mui/material';
+/* eslint-disable react/prop-types */
+import { Box, Button, LinearProgress } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { archiveApiData, getApiData, postApiData } from '../../ApiConfig/Api';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Card from '../Card/Card';
 import EditInput from '../EditInput/EditInput';
+import Error from '../Error/Error';
 
 function List({ listId, name, handleArchive }) {
   const [cards, setCards] = useState([]);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
 
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
   const handleClick = () => {
-    setOpen(true)
+    setOpen(true);
   };
 
   const handleClose = () => {
-    setOpen(false)
+    setOpen(false);
   };
 
   useEffect(() => {
@@ -28,29 +29,43 @@ function List({ listId, name, handleArchive }) {
     if (userInput === '') {
       return alert('please specify card name');
     }
+    if (userInput.length > 15) {
+      return alert('out of word limit');
+    }
     const res = await postApiData(`/cards?name=${userInput}&idList=${listId}`);
-    setCards((data) => [...data, res]);
+    
+    if (res !== undefined) {
+      setCards((data) => [...data, res]);
+    }
   };
 
-  const handleDeleteCard = async(cardId)=>{
-    const res =await archiveApiData(`/cards/${cardId}?closed=true`)
-    const newData = cards.filter(({id})=>id !== cardId)
-    setCards(newData)
-  }
+  const handleDeleteCard = async (cardId) => {
+    const res = await archiveApiData(`/cards/${cardId}?closed=true`);
+
+    if (res) {
+      const newData = cards.filter(({ id }) => id !== cardId);
+      setCards(newData);
+    }
+  };
   if (error) {
-    return <>error</>;
+    return <Error />;
   }
 
   if (loading) {
-    return <>loading</>;
+    return (
+      <Box sx={{ width: '15rem', color: '#32a889' }}>
+        <LinearProgress color="inherit" />
+      </Box>
+    );
   }
 
   return (
     <Box
       sx={{
         height: 'fit-content',
-        padding: '0.5rem',
         minWidth: '15rem',
+        padding: '0.5rem',
+        width: '15rem',
         borderRadius: '0.5rem',
         backgroundColor: 'rgba(255,255,255,0.3)',
       }}
@@ -62,7 +77,7 @@ function List({ listId, name, handleArchive }) {
           justifyContent: 'space-between',
           alignItems: 'center',
           gap: '0.2rem',
-          borderBottom:"1px solid rgba(255,255,255,0.3)"
+          borderBottom: '1px solid rgba(255,255,255,0.3)',
         }}
       >
         <Box
@@ -97,7 +112,6 @@ function List({ listId, name, handleArchive }) {
         </Box>
       </Box>
       <Box
-       
         sx={{
           maxHeight: '60vh',
           overflowY: 'scroll',
@@ -109,7 +123,12 @@ function List({ listId, name, handleArchive }) {
         }}
       >
         {cards.map(({ id, name }) => (
-          <Card key={id} name={name} cardId={id} handleDelete={handleDeleteCard}></Card>
+          <Card
+            key={id}
+            name={name}
+            cardId={id}
+            handleDelete={handleDeleteCard}
+          ></Card>
         ))}
       </Box>
       <Box my={1}>
@@ -117,7 +136,8 @@ function List({ listId, name, handleArchive }) {
           <EditInput
             handleClose={handleClose}
             handleAdd={handleAddCard}
-            title={"Enter a title for this card"}
+            title={'Enter a title for this card'}
+            buttonName={'Add card'}
           />
         ) : (
           <Button

@@ -1,17 +1,28 @@
-import { Box, Button, Checkbox, FormGroup } from '@mui/material';
+/* eslint-disable react/prop-types */
 import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import { useEffect, useState } from 'react';
-import { archiveApiData, deleteApiData, getApiData, postApiData } from '../../ApiConfig/Api';
 import EditInput from '../EditInput/EditInput';
 import ProgressBar from '../ProgressBar/ProgressBar.jsx';
+import {
+  Box,
+  Button,
+  Checkbox,
+  FormGroup,
+  LinearProgress,
+} from '@mui/material';
+import {
+  archiveApiData,
+  deleteApiData,
+  getApiData,
+  postApiData,
+} from '../../ApiConfig/Api';
 
-function CheckList({ name, checkListId, cardId,onDeleteChecklist }) {
+function CheckList({ name, checkListId, cardId, onDeleteChecklist }) {
   const [checkItem, setCheckItem] = useState([]);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  console.log(cardId,checkListId)
 
   useEffect(() => {
     getApiData(
@@ -36,12 +47,12 @@ function CheckList({ name, checkListId, cardId,onDeleteChecklist }) {
     const res = await postApiData(
       `/checklists/${checkListId}/checkItems?name=${userInput}`
     );
-    setCheckItem((value) => [...value, res]);
+    if (res) {
+      setCheckItem((value) => [...value, res]);
+    }
   };
 
   const handleDeleteCheckItem = (itemId) => {
-    // `/checklists/${checkListId}/checkItems/${itemId}`
-
     deleteApiData(
       `/checklists/${checkListId}/checkItems/${itemId}`,
       setCheckItem,
@@ -64,33 +75,30 @@ function CheckList({ name, checkListId, cardId,onDeleteChecklist }) {
     return Math.floor(((count / checkItem.length) * 100).toFixed(2));
   };
 
-
-  const handleChange = async(checkItemId, state,name)=>{
+  const handleChange = async (checkItemId, state) => {
     const checkboxState = state === 'complete' ? 'incomplete' : 'complete';
-// console.log(checkItemId, name,checkboxState)
-    const res = await archiveApiData(`/cards/${cardId}/checkItem/${checkItemId}?state=${checkboxState}`)
-    setCheckItem((data)=>{
-        const newData = data.map((obj)=>{
-            if(obj.id === res.id){
-                obj.state = checkboxState
-            }
-            return obj
-        })  
-        return newData
-    })
-
-  }
-
-  if (error) {
-    return <>Error</>;
-  }
+    // console.log(checkItemId, name,checkboxState)
+    const res = await archiveApiData(
+      `/cards/${cardId}/checkItem/${checkItemId}?state=${checkboxState}`
+    );
+    setCheckItem((data) => {
+      const newData = data.map((obj) => {
+        if (obj.id === res.id) {
+          obj.state = checkboxState;
+        }
+        return obj;
+      });
+      return newData;
+    });
+  };
 
   if (loading) {
-    return <>Loading</>;
+    return (
+      <Box sx={{ width: '100%' }}>
+        <LinearProgress size="small" sx={{ height: '2px' }} />
+      </Box>
+    );
   }
-
-  console.log(checkItem);
-  //   progressValue()
 
   return (
     <Box sx={{ marginBottom: '1rem' }}>
@@ -146,100 +154,107 @@ function CheckList({ name, checkListId, cardId,onDeleteChecklist }) {
           </Button>
         </Box>
       </Box>
-      <Box>
-        <ProgressBar value={progressValue()} />
-      </Box>
-      <Box className="check-item">
-        <FormGroup>
-          {checkItem.map(({ id, name, state }) => (
-            <Box
-              key={id}
-              sx={{
-                margin: '0.2rem 0rem',
-                display: 'flex',
-                borderRadius: '0.2rem',
-
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <Box
-                sx={{
-                  width: '90%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.2rem',
-                }}
-              >
-                <Box sx={{ cursor: 'pointer' }}>
-                  <Checkbox
-                    checked={state === 'complete' ? true : false}
-                    size="small"
-                    sx={{ color: 'white' }}
-                    color="default"
-                    onChange={()=>(handleChange(id, state,name))}
-                  />
-                </Box>
+      {error ? (
+        <Box sx={{ width: '100%', color: 'white' }}>
+          something went wrong!! Please try again
+        </Box>
+      ) : (
+        <>
+          <Box>
+            <ProgressBar value={progressValue()} />
+          </Box>
+          <Box className="check-item">
+            <FormGroup>
+              {checkItem.map(({ id, name, state }) => (
                 <Box
+                  key={id}
                   sx={{
-                    width: '100%',
-                    height: '100%',
-                    padding: '0.55rem 0.4rem',
-                    color: 'white',
-                    borderBottom: '1px solid rgba(255,255,255,1)',
+                    margin: '0.2rem 0rem',
+                    display: 'flex',
+                    borderRadius: '0.2rem',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
                   }}
                 >
-                  {name}
-                </Box>
-              </Box>
-              <Box
-                sx={{
-                  //   width: '10%',
-                  height: '100%',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
+                  <Box
+                    sx={{
+                      width: '90%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.2rem',
+                    }}
+                  >
+                    <Box sx={{ cursor: 'pointer' }}>
+                      <Checkbox
+                        checked={state === 'complete' ? true : false}
+                        size="small"
+                        sx={{ color: 'white' }}
+                        color="default"
+                        onChange={() => handleChange(id, state, name)}
+                      />
+                    </Box>
+                    <Box
+                      sx={{
+                        width: '100%',
+                        height: '100%',
+                        padding: '0.55rem 0.4rem',
+                        color: 'white',
+                        borderBottom: '1px solid rgba(255,255,255,1)',
+                      }}
+                    >
+                      {name}
+                    </Box>
+                  </Box>
+                  <Box
+                    sx={{
+                      //   width: '10%',
+                      height: '100%',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
 
-                  cursor: 'pointer',
-                  borderRadius: '0.5rem',
-                  padding: '0.2rem 0.2rem',
-                  backgroundColor: 'rgba(255,255,255,0.1)',
-                  '&:hover': {
-                    boxShadow: 'rgba(0, 0, 0, 0.24) 0px 3px 8px',
-                  },
-                }}
-                onClick={() => handleDeleteCheckItem(id)}
-              >
-                <RemoveCircleOutlineOutlinedIcon sx={{ color: 'white' }} />
-              </Box>
+                      cursor: 'pointer',
+                      borderRadius: '0.5rem',
+                      padding: '0.2rem 0.2rem',
+                      backgroundColor: 'rgba(255,255,255,0.1)',
+                      '&:hover': {
+                        boxShadow: 'rgba(0, 0, 0, 0.24) 0px 3px 8px',
+                      },
+                    }}
+                    onClick={() => handleDeleteCheckItem(id)}
+                  >
+                    <RemoveCircleOutlineOutlinedIcon sx={{ color: 'white' }} />
+                  </Box>
+                </Box>
+              ))}
+            </FormGroup>
+            <Box sx={{ marginLeft: '3rem' }}>
+              {open ? (
+                <EditInput
+                  handleClose={handleClose}
+                  title={'add item'}
+                  handleAdd={handleAddCheckItem}
+                />
+              ) : (
+                <Button
+                  onClick={handleOpen}
+                  sx={{
+                    color: 'white',
+                    marginTop: '0.5rem',
+                    backgroundColor: 'rgba(255,255,255,0.1)',
+                    boxShadow: 'rgba(0, 0, 0, 0.16) 0px 1px 4px',
+                    '&:hover': {
+                      backgroundColor: 'rgba(255,255,255,0.3)',
+                    },
+                  }}
+                >
+                  Add item
+                </Button>
+              )}
             </Box>
-          ))}
-        </FormGroup>
-        <Box sx={{ marginLeft: '3rem' }}>
-          {open ? (
-            <EditInput
-              handleClose={handleClose}
-              title={'add item'}
-              handleAdd={handleAddCheckItem}
-            />
-          ) : (
-            <Button
-              onClick={handleOpen}
-              sx={{
-                color: 'white',
-                marginTop: '0.5rem',
-                backgroundColor: 'rgba(255,255,255,0.1)',
-                boxShadow: 'rgba(0, 0, 0, 0.16) 0px 1px 4px',
-                '&:hover': {
-                  backgroundColor: 'rgba(255,255,255,0.3)',
-                },
-              }}
-            >
-              Add item
-            </Button>
-          )}
-        </Box>
-      </Box>
+          </Box>
+        </>
+      )}
     </Box>
   );
 }

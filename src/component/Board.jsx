@@ -6,6 +6,8 @@ import BoardCard from './Board/BoardCard';
 import OpenModal from './Modal/Modal';
 import CreateBoard from './Board/CreateBoard';
 import { Link } from 'react-router-dom';
+import Loading from './Loading/Loading';
+import Error from './Error/Error';
 
 function Board() {
   const [boards, setBoards] = useState([]);
@@ -24,6 +26,7 @@ function Board() {
   const handleClose = () => setOpen(false);
 
   const handleCreateBoard = async (userInput) => {
+    userInput.trim()
     if(userInput === ""){
       return alert("please provide title")
     }
@@ -33,10 +36,10 @@ function Board() {
   };
 
   if (error) {
-    return <>{error.message}</>;
+    return <Error/>;
   }
   if (loading) {
-    return <>Loading</>;
+    return<Loading/>
   }
   return (
     <>

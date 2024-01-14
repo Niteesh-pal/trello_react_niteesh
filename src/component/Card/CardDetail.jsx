@@ -1,10 +1,11 @@
-import { Box } from '@mui/material';
+/* eslint-disable react/prop-types */
+import { Box, CircularProgress } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { deleteApiData, getApiData, postApiData } from '../../ApiConfig/Api';
 
 import EditInput from '../EditInput/EditInput';
 import CheckList from '../CheckList/CheckList';
-import { Height } from '@mui/icons-material';
+import Error from '../Error/Error';
 
 function CardDetail({ name, cardId }) {
   const [checkList, setCheckList] = useState([]);
@@ -27,22 +28,52 @@ function CardDetail({ name, cardId }) {
   const handleClose = () => {
     setOpen(false);
   };
-  const handleAddChecklist = async(userInput) => {
-    if(userInput === ""){
-        return alert("enter title")
+  const handleAddChecklist = async (userInput) => {
+    if (userInput === '') {
+      return alert('enter title');
     }
-    const res = await postApiData(`/checklists?name=${userInput}&idCard=${cardId}`)
-    setCheckList((checklist)=>[...checklist, res])
+    const res = await postApiData(
+      `/checklists?name=${userInput}&idCard=${cardId}`
+    );
+
+    if (res) {
+      setCheckList((checklist) => [...checklist, res]);
+    }
   };
 
-  const handleDeleteCheckList = async(checkListId )=>{
-        deleteApiData(`/checklists/${checkListId}?`,setCheckList,checkListId)
+  const handleDeleteCheckList = async (checkListId) => {
+    deleteApiData(`/checklists/${checkListId}?`, setCheckList, checkListId);
+  };
+
+
+  if (error) {
+    return <Error />;
   }
 
-  console.log(checkList);
-
   if (loading) {
-    return <>Loading</>;
+    return (
+      <Box
+        sx={{
+          padding: '1rem',
+          borderRadius: '0.5rem',
+          backgroundColor: 'rgba(255,255,255,0.4)',
+          backdropFilter: 'blur(4px)',
+        }}
+      >
+        <Box
+          sx={{
+            width: '15rem',
+            height: '15rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'white',
+          }}
+        >
+          <CircularProgress color="inherit" />
+        </Box>
+      </Box>
+    );
   }
 
   return (
@@ -55,7 +86,6 @@ function CardDetail({ name, cardId }) {
         backgroundColor: 'rgba(255,255,255,0.5)',
         backdropFilter: 'blur(4px)',
       }}
-      
     >
       <Box
         className="cards-container"
@@ -78,23 +108,29 @@ function CardDetail({ name, cardId }) {
       >
         <Box
           sx={{
-            
             width: '100%',
-            maxHeight:"75vh",
-            overflowY:"scroll",
-            padding:"0.5rem 0rem",
+            maxHeight: '75vh',
+            overflowY: 'scroll',
+            padding: '0.5rem 0rem',
             msOverflowStyle: 'none',
-          scrollbarWidth: 'none',
-          '&::-webkit-scrollbar': {
-            display: 'none',
-          },
+            scrollbarWidth: 'none',
+            '&::-webkit-scrollbar': {
+              display: 'none',
+            },
           }}
         >
           {
-            checkList.map(({id, name})=>(
-                <CheckList key={id} name={name} checkListId={id} cardId={cardId} onDeleteChecklist={handleDeleteCheckList}></CheckList>
-            ))
-          }
+            checkList.length>0?
+          checkList.map(({ id, name }) => (
+            <CheckList
+              key={id}
+              name={name}
+              checkListId={id}
+              cardId={cardId}
+              onDeleteChecklist={handleDeleteCheckList}
+            ></CheckList>
+          )):"Create a checklist"
+        }
         </Box>
         <Box
           sx={{

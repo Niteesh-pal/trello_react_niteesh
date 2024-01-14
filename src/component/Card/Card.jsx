@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { Box } from '@mui/material';
 
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -28,7 +29,7 @@ function Card({ name, cardId, handleDelete }) {
       }}
       onClick={handleOpen}
     >
-      <Box sx={{ color: 'white' }}>{name}</Box>
+      <Box sx={{ color: 'white', width:"11rem",}}>{name}</Box>
       <Box
         sx={{
           display: 'flex',

@@ -5,9 +5,10 @@ import { useEffect, useState } from 'react';
 import { archiveApiData, getApiData, postApiData } from '../../ApiConfig/Api';
 import List from '../List/List';
 import pic2 from '../../assets/pic2.jpg';
-import OpenInputField from '../Input/OpenInputField';
 import AddIcon from '@mui/icons-material/Add';
 import EditInput from '../EditInput/EditInput';
+import Loading from '../Loading/Loading';
+import Error from '../Error/Error';
 
 function BoardDetail() {
   const { id } = useParams();
@@ -31,26 +32,25 @@ function BoardDetail() {
   const handleOpenInput = () => {
     setAddList(true);
   };
-  const handleClose = ()=>{
-    setAddList(false)
-  }
+  const handleClose = () => {
+    setAddList(false);
+  };
 
-  const handleAddList = async(userInput)=>{
-    if(userInput === ""){
-     return alert("please enter title")
+  const handleAddList = async (userInput) => {
+    if (userInput === '') {
+      return alert('please enter title');
     }
 
-    const res = await postApiData(`/lists?name=${userInput}&idBoard=${id}`)
-    setLists((lists)=>[...lists, res])
-
-  }
+    const res = await postApiData(`/lists?name=${userInput}&idBoard=${id}`);
+    setLists((lists) => [...lists, res]);
+  };
 
   if (error) {
-    return <>{error.message}</>;
+    return <Error />;
   }
 
   if (loading) {
-    return <>Loading</>;
+    return <Loading />;
   }
 
   // console.log(board);
@@ -81,15 +81,19 @@ function BoardDetail() {
         {openAddList ? (
           <Box
             sx={{
-              border:"1px solid red",
-              width: '25rem',
+              width: '13rem',
               height: 'fit-content',
               padding: '0.5rem',
               backgroundColor: 'rgba(255,255,255,0.5)',
-              borderRadius:"0.5rem"
+              borderRadius: '0.5rem',
             }}
           >
-            <EditInput title={"Enter list title"} handleClose={handleClose} handleAdd={handleAddList}/>
+            <EditInput
+              title={'Enter list title'}
+              handleClose={handleClose}
+              handleAdd={handleAddList}
+              buttonName={'Add list'}
+            />
           </Box>
         ) : (
           <Box sx={{ backgroundColor: 'rgbba(255,255,255,0.5)' }}>
