@@ -1,4 +1,5 @@
 import api from '../ApiConfig/axiosConfig';
+import { action } from '../ReducerFunction/stateActionType';
 
 const getApiData = async (url, setData, setLoading, setError) => {
   try {
@@ -30,19 +31,30 @@ const archiveApiData = async (url) => {
     alert("Something went wrong")
   }
 };
-const deleteApiData = async (url, setData, checkListId) => {
+const deleteApiData = async (url) => {
   try {
     const response = await api.delete(url);
     // console.log(response)
-    if (response) {
-      setData((data) => {
-        const newdata = data.filter(({ id }) => id !== checkListId);
-        return newdata;
-      });
-    }
+    return response
+    // if (response) {
+    //   setData((data) => {
+    //     const newdata = data.filter(({ id }) => id !== checkListId);
+    //     return newdata;
+    //   });
+    // }
   } catch (error) {
     alert('error occurred');
   }
 };
 
-export { getApiData, postApiData, archiveApiData, deleteApiData };
+const fetchApiData = async(url,dispatch)=>{
+  try {
+    const response = await api.get(url)
+    dispatch({type:action.FETCH_DATA, payload:response.data})
+  } catch (error) {
+    console.log(error.message)
+    dispatch({type:action.ERROR})
+  }
+}
+
+export { getApiData, postApiData, archiveApiData, deleteApiData, fetchApiData };

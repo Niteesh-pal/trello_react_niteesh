@@ -11,7 +11,6 @@ function BoardCard({children ,bg,onClickModal }) {
         padding: '1rem',
         borderRadius: '0.5rem',
         backgroundColor: bg?.backgroundBottomColor?bg.backgroundBottomColor:"gray",
-        
         fontSize:"1.2rem",
         color:"white",
         cursor:"pointer",

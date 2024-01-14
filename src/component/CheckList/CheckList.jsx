@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer } from 'react';
 import EditInput from '../EditInput/EditInput';
 import ProgressBar from '../ProgressBar/ProgressBar.jsx';
 import {
@@ -14,30 +14,33 @@ import {
 import {
   archiveApiData,
   deleteApiData,
-  getApiData,
+  fetchApiData,
   postApiData,
 } from '../../ApiConfig/Api';
+import { initialState, reducer } from '../../ReducerFunction/operation.js';
+import { action } from '../../ReducerFunction/stateActionType.js';
 
 function CheckList({ name, checkListId, cardId, onDeleteChecklist }) {
-  const [checkItem, setCheckItem] = useState([]);
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { data: checkItem, loading, error, open } = state;
+
+  // const [checkItem, setCheckItem] = useState([]);
+  // const [error, setError] = useState(false);
+  // const [loading, setLoading] = useState(false);
+  // const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    getApiData(
-      `/checklists/${checkListId}/checkItems`,
-      setCheckItem,
-      setLoading,
-      setError
-    );
+    dispatch({ type: action.LOADING });
+    fetchApiData(`/checklists/${checkListId}/checkItems`, dispatch);
   }, []);
 
   const handleOpen = () => {
-    setOpen(true);
+    // setOpen(true);
+    dispatch({ type: action.TOGGLE_OPEN, payload: true });
   };
   const handleClose = () => {
-    setOpen(false);
+    // setOpen(false);
+    dispatch({ type: action.TOGGLE_OPEN, payload: false });
   };
 
   const handleAddCheckItem = async (userInput) => {
@@ -48,16 +51,19 @@ function CheckList({ name, checkListId, cardId, onDeleteChecklist }) {
       `/checklists/${checkListId}/checkItems?name=${userInput}`
     );
     if (res) {
-      setCheckItem((value) => [...value, res]);
+      dispatch({ type: action.ADD_DATA, payload: res });
     }
   };
 
-  const handleDeleteCheckItem = (itemId) => {
-    deleteApiData(
-      `/checklists/${checkListId}/checkItems/${itemId}`,
-      setCheckItem,
-      itemId
+  const handleDeleteCheckItem = async (itemId) => {
+  
+    const res = await deleteApiData(
+      `/checklists/${checkListId}/checkItems/${itemId}`
     );
+    if (res) {
+      const newData = checkItem.filter(({ id }) => id !== itemId);
+      dispatch({ type: action.DELETE_DATA, payload: newData });
+    }
   };
 
   const progressValue = () => {
@@ -77,25 +83,27 @@ function CheckList({ name, checkListId, cardId, onDeleteChecklist }) {
 
   const handleChange = async (checkItemId, state) => {
     const checkboxState = state === 'complete' ? 'incomplete' : 'complete';
-    // console.log(checkItemId, name,checkboxState)
+
     const res = await archiveApiData(
       `/cards/${cardId}/checkItem/${checkItemId}?state=${checkboxState}`
     );
-    setCheckItem((data) => {
-      const newData = data.map((obj) => {
-        if (obj.id === res.id) {
-          obj.state = checkboxState;
+
+    if (res) {
+      const newData = checkItem.map((item) => {
+        if (item.id === res.id) {
+          item.state = checkboxState;
         }
-        return obj;
+
+        return item;
       });
-      return newData;
-    });
+      dispatch({ type: action.UPDATE_DATA, payload: newData });
+    }
   };
 
   if (loading) {
     return (
       <Box sx={{ width: '100%' }}>
-        <LinearProgress size="small" sx={{ height: '2px' }} />
+        <LinearProgress size="small" sx={{ height: '1px' }} />
       </Box>
     );
   }

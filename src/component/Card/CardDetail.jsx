@@ -1,56 +1,79 @@
 /* eslint-disable react/prop-types */
 import { Box, CircularProgress } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { deleteApiData, getApiData, postApiData } from '../../ApiConfig/Api';
+import { useEffect, useReducer } from 'react';
+import { deleteApiData, fetchApiData, postApiData } from '../../ApiConfig/Api';
 
 import EditInput from '../EditInput/EditInput';
 import CheckList from '../CheckList/CheckList';
 import Error from '../Error/Error';
+import { initialState, reducer } from '../../ReducerFunction/operation';
+import { action } from '../../ReducerFunction/stateActionType';
+import trelloSvg from "../../assets/trello_svg.svg"
 
 function CardDetail({ name, cardId }) {
-  const [checkList, setCheckList] = useState([]);
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { data: checkList, loading, error, open } = state;
 
   useEffect(() => {
-    getApiData(
-      `/cards/${cardId}/checklists`,
-      setCheckList,
-      setLoading,
-      setError
-    );
+    const fetchdata = async () => {
+      try {
+        dispatch({ type: action.LOADING });
+        fetchApiData(`/cards/${cardId}/checklists`, dispatch);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchdata();
   }, []);
 
   const handleOpen = () => {
-    setOpen(true);
+    dispatch({ type: action.TOGGLE_OPEN, payload: true });
   };
   const handleClose = () => {
-    setOpen(false);
+    dispatch({ type: action.TOGGLE_OPEN, payload: false });
   };
+
   const handleAddChecklist = async (userInput) => {
     if (userInput === '') {
-      return alert('enter title');
+      return alert('Please enter title');
     }
     const res = await postApiData(
       `/checklists?name=${userInput}&idCard=${cardId}`
     );
 
-    if (res) {
-      setCheckList((checklist) => [...checklist, res]);
+    if (res !== undefined) {
+      dispatch({ type: action.ADD_DATA, payload: res });
     }
   };
 
   const handleDeleteCheckList = async (checkListId) => {
-    deleteApiData(`/checklists/${checkListId}?`, setCheckList, checkListId);
+    const res = await deleteApiData(`/checklists/${checkListId}`);
+    if (res) {
+      const newData = checkList.filter(({ id }) => id !== checkListId);
+      dispatch({ type: action.DELETE_DATA, payload: newData });
+    }
   };
 
-
   if (error) {
-    return <Error />;
+    return (
+      <Box
+        border={'1px solid white'}
+        sx={{
+          textAlign: 'center',
+          color: 'white',
+          backgroundColor: 'rgba(255,255,255,0.4)',
+          backdropFilter: 'blur(4px)',
+          borderRadius: '0.5rem',
+        }}
+      >
+        <Error />
+        Unable to get your checklist
+      </Box>
+    );
   }
 
-  if (loading) {
+  if (loading ) {
     return (
       <Box
         sx={{
@@ -70,7 +93,8 @@ function CardDetail({ name, cardId }) {
             color: 'white',
           }}
         >
-          <CircularProgress color="inherit" />
+          {/* <CircularProgress color="inherit" /> */}
+          <img src={trelloSvg} alt=""  />
         </Box>
       </Box>
     );
@@ -119,18 +143,28 @@ function CardDetail({ name, cardId }) {
             },
           }}
         >
-          {
-            checkList.length>0?
-          checkList.map(({ id, name }) => (
-            <CheckList
-              key={id}
-              name={name}
-              checkListId={id}
-              cardId={cardId}
-              onDeleteChecklist={handleDeleteCheckList}
-            ></CheckList>
-          )):"Create a checklist"
-        }
+          {checkList.length > 0 ? (
+            checkList.map(({ id, name }) => (
+              <CheckList
+                key={id}
+                name={name}
+                checkListId={id}
+                cardId={cardId}
+                onDeleteChecklist={handleDeleteCheckList}
+              ></CheckList>
+            ))
+          ) : (
+            <Box
+              sx={{
+                color: 'white',
+                display: 'flex',
+                justifyContent: 'center',
+                fontSize: '1.2rem',
+              }}
+            >
+              Create a checkList
+            </Box>
+          )}
         </Box>
         <Box
           sx={{
@@ -164,7 +198,7 @@ function CardDetail({ name, cardId }) {
                 color: 'rgba(255,255,255,1)',
                 margin: '0.1rem 0rem',
                 borderRadius: '0.2rem',
-                bgcolor: 'rgba(0,0,0,0.3)',
+                bgcolor: 'rgba(255,255,255,0.3)',
                 cursor: 'pointer',
                 '&:hover': { backgroundColor: 'rgba(255,255,255,0.5)' },
               }}
