@@ -40,6 +40,9 @@ function BoardDetail() {
     if (userInput === '') {
       return alert('please enter title');
     }
+    if (userInput.length > 15) {
+      return alert('out of word limit');
+    }
 
     const res = await postApiData(`/lists?name=${userInput}&idBoard=${id}`);
     setLists((lists) => [...lists, res]);

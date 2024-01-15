@@ -61,8 +61,8 @@ function CheckList({ name, checkListId, cardId, onDeleteChecklist }) {
       `/checklists/${checkListId}/checkItems/${itemId}`
     );
     if (res) {
-      const newData = checkItem.filter(({ id }) => id !== itemId);
-      dispatch({ type: action.DELETE_DATA, payload: newData });
+      // const newData = checkItem.filter(({ id }) => id !== itemId);
+      dispatch({ type: action.DELETE_DATA, payload: itemId });
     }
   };
 

@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { Box, CircularProgress } from '@mui/material';
+import { Box } from '@mui/material';
 import { useEffect, useReducer } from 'react';
 import { deleteApiData, fetchApiData, postApiData } from '../../ApiConfig/Api';
 
@@ -50,8 +50,8 @@ function CardDetail({ name, cardId }) {
   const handleDeleteCheckList = async (checkListId) => {
     const res = await deleteApiData(`/checklists/${checkListId}`);
     if (res) {
-      const newData = checkList.filter(({ id }) => id !== checkListId);
-      dispatch({ type: action.DELETE_DATA, payload: newData });
+      // const newData = checkList.filter(({ id }) => id !== checkListId);
+      dispatch({ type: action.DELETE_DATA, payload: checkListId });
     }
   };
 

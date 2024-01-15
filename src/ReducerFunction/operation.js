@@ -23,7 +23,7 @@ export const reducer = (state, action) => {
       return { ...state, data: [...state.data, action.payload] };
 
     case 'DELETE_DATA':
-      return { ...state, data: action.payload };
+      return { ...state, data: state.data.filter(({ id }) => id !== action.payload) };
 
     case 'UPDATE_DATA':
       return { ...state, data: action.payload };
