@@ -45,7 +45,6 @@ function CardDetail({ name, cardId }) {
     deleteApiData(`/checklists/${checkListId}?`, setCheckList, checkListId);
   };
 
-
   if (error) {
     return <Error />;
   }
@@ -119,18 +118,17 @@ function CardDetail({ name, cardId }) {
             },
           }}
         >
-          {
-            checkList.length>0?
-          checkList.map(({ id, name }) => (
-            <CheckList
-              key={id}
-              name={name}
-              checkListId={id}
-              cardId={cardId}
-              onDeleteChecklist={handleDeleteCheckList}
-            ></CheckList>
-          )):"Create a checklist"
-        }
+          {checkList.length > 0
+            ? checkList.map(({ id, name }) => (
+                <CheckList
+                  key={id}
+                  name={name}
+                  checkListId={id}
+                  cardId={cardId}
+                  onDeleteChecklist={handleDeleteCheckList}
+                ></CheckList>
+              ))
+            : 'Create a checklist'}
         </Box>
         <Box
           sx={{

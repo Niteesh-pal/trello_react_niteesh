@@ -17,12 +17,17 @@ import {
   getApiData,
   postApiData,
 } from '../../ApiConfig/Api';
+import { useDispatch, useSelector } from 'react-redux';
+import { toggleOpen } from '../../feature/checkList/checkListSlice.js';
 
 function CheckList({ name, checkListId, cardId, onDeleteChecklist }) {
   const [checkItem, setCheckItem] = useState([]);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [open, setOpen] = useState(false);
+  // const [open, setOpen] = useState(false);
+  
+  const dispatch = useDispatch()
+  const open = useSelector((state)=>state.open)
 
   useEffect(() => {
     getApiData(
@@ -34,10 +39,12 @@ function CheckList({ name, checkListId, cardId, onDeleteChecklist }) {
   }, []);
 
   const handleOpen = () => {
-    setOpen(true);
+    // setOpen(true);
+    dispatch(toggleOpen(true))
   };
   const handleClose = () => {
-    setOpen(false);
+    // setOpen(false);
+    dispatch(toggleOpen(false))
   };
 
   const handleAddCheckItem = async (userInput) => {
