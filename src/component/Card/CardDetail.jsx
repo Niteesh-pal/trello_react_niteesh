@@ -1,25 +1,47 @@
 /* eslint-disable react/prop-types */
 import { Box, CircularProgress } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { deleteApiData, getApiData, postApiData } from '../../ApiConfig/Api';
+import { deleteApiData, fetchApiData,postApiData } from '../../ApiConfig/Api';
 
 import EditInput from '../EditInput/EditInput';
 import CheckList from '../CheckList/CheckList';
 import Error from '../Error/Error';
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteCheckList, getCheckListData, setCheckListData } from '../../app/Slices/checkListSlice';
 
 function CardDetail({ name, cardId }) {
-  const [checkList, setCheckList] = useState([]);
+  // const [checkList, setCheckList] = useState([]);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
+  const dispatch = useDispatch()
+  const checkList = useSelector((state)=>state.checkList.data)
+  
+  
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError(false);
+      const res = await fetchApiData(`/cards/${cardId}/checklists`);
+      dispatch(getCheckListData(res.data));
+      setLoading(false);
+    } catch (error) {
+      setError(true);
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
-    getApiData(
-      `/cards/${cardId}/checklists`,
-      setCheckList,
-      setLoading,
-      setError
-    );
+    // getApiData(
+    //   `/cards/${cardId}/checklists`,
+    //   setCheckList,
+    //   setLoading,
+    //   setError
+    // );
+
+    fetchData();
   }, []);
 
   const handleOpen = () => {
@@ -37,12 +59,19 @@ function CardDetail({ name, cardId }) {
     );
 
     if (res) {
-      setCheckList((checklist) => [...checklist, res]);
+      // setCheckList((checklist) => [...checklist, res]);
+      dispatch(setCheckListData(res))
     }
   };
 
   const handleDeleteCheckList = async (checkListId) => {
-    deleteApiData(`/checklists/${checkListId}?`, setCheckList, checkListId);
+    const res = deleteApiData(
+      `/checklists/${checkListId}?`
+    );
+
+    if(res){
+      dispatch(deleteCheckList(checkListId))
+    }
   };
 
   if (error) {

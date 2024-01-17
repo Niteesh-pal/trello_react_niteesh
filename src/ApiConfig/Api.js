@@ -30,19 +30,24 @@ const archiveApiData = async (url) => {
     alert("Something went wrong")
   }
 };
-const deleteApiData = async (url, setData, checkListId) => {
+const deleteApiData = async (url) => {
   try {
     const response = await api.delete(url);
     // console.log(response)
-    if (response) {
-      setData((data) => {
-        const newdata = data.filter(({ id }) => id !== checkListId);
-        return newdata;
-      });
-    }
+    // if (response) {
+    //   setData((data) => {
+    //     const newdata = data.filter(({ id }) => id !== checkListId);
+    //     return newdata;
+    //   });
+    // }
+    return response.data;
   } catch (error) {
     alert('error occurred');
   }
 };
 
-export { getApiData, postApiData, archiveApiData, deleteApiData };
+const fetchApiData = (url)=>{
+  return api.get(url)
+}
+
+export { getApiData, postApiData, archiveApiData, deleteApiData ,fetchApiData};

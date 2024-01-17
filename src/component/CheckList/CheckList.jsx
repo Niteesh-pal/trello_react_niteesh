@@ -11,40 +11,55 @@ import {
   FormGroup,
   LinearProgress,
 } from '@mui/material';
+
 import {
   archiveApiData,
   deleteApiData,
-  getApiData,
+  fetchApiData,
   postApiData,
 } from '../../ApiConfig/Api';
 import { useDispatch, useSelector } from 'react-redux';
-import { toggleOpen } from '../../feature/checkList/checkListSlice.js';
+import { deleteCheckItem, getData, setCheckItemCheckBox, setCheckItemData } from '../../app/Slices/checkItemSlice.js';
 
 function CheckList({ name, checkListId, cardId, onDeleteChecklist }) {
-  const [checkItem, setCheckItem] = useState([]);
+  // const [checkItem, setCheckItem] = useState([]);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
-  // const [open, setOpen] = useState(false);
-  
-  const dispatch = useDispatch()
-  const open = useSelector((state)=>state.open)
+  const [open, setOpen] = useState(false);
+
+  const dispatch = useDispatch();
+
+  const checkItem = useSelector((state) => state.checkItem.data);
+  console.log(checkItem);
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError(false);
+      const res = await fetchApiData(`/checklists/${checkListId}/checkItems`);
+      dispatch(getData(res.data));
+      setLoading(false);
+    } catch (error) {
+      setError(true);
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
-    getApiData(
-      `/checklists/${checkListId}/checkItems`,
-      setCheckItem,
-      setLoading,
-      setError
-    );
+    // getApiData(
+    //   `/checklists/${checkListId}/checkItems`,
+    //   setCheckItem,
+    //   setLoading,
+    //   setError
+    // );
+
+    fetchData();
   }, []);
 
   const handleOpen = () => {
-    // setOpen(true);
-    dispatch(toggleOpen(true))
+    setOpen(true);
   };
   const handleClose = () => {
-    // setOpen(false);
-    dispatch(toggleOpen(false))
+    setOpen(false);
   };
 
   const handleAddCheckItem = async (userInput) => {
@@ -55,16 +70,20 @@ function CheckList({ name, checkListId, cardId, onDeleteChecklist }) {
       `/checklists/${checkListId}/checkItems?name=${userInput}`
     );
     if (res) {
-      setCheckItem((value) => [...value, res]);
+      // setCheckItem((value) => [...value, res]);
+
+      dispatch(setCheckItemData(res));
     }
   };
 
   const handleDeleteCheckItem = (itemId) => {
-    deleteApiData(
-      `/checklists/${checkListId}/checkItems/${itemId}`,
-      setCheckItem,
-      itemId
+    const res = deleteApiData(
+      `/checklists/${checkListId}/checkItems/${itemId}`
     );
+
+    if(res){
+      dispatch(deleteCheckItem(itemId))
+    }
   };
 
   const progressValue = () => {
@@ -88,15 +107,18 @@ function CheckList({ name, checkListId, cardId, onDeleteChecklist }) {
     const res = await archiveApiData(
       `/cards/${cardId}/checkItem/${checkItemId}?state=${checkboxState}`
     );
-    setCheckItem((data) => {
-      const newData = data.map((obj) => {
-        if (obj.id === res.id) {
-          obj.state = checkboxState;
-        }
-        return obj;
-      });
-      return newData;
-    });
+    // setCheckItem((data) => {
+    //   const newData = data.map((obj) => {
+    //     if (obj.id === res.id) {
+    //       obj.state = checkboxState;
+    //     }
+    //     return obj;
+    //   });
+    //   return newData;
+    // });
+    if(res){
+      dispatch(setCheckItemCheckBox({id:checkItemId,state:checkboxState}))
+    }
   };
 
   if (loading) {
@@ -172,68 +194,74 @@ function CheckList({ name, checkListId, cardId, onDeleteChecklist }) {
           </Box>
           <Box className="check-item">
             <FormGroup>
-              {checkItem.map(({ id, name, state }) => (
-                <Box
-                  key={id}
-                  sx={{
-                    margin: '0.2rem 0rem',
-                    display: 'flex',
-                    borderRadius: '0.2rem',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: '90%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.2rem',
-                    }}
-                  >
-                    <Box sx={{ cursor: 'pointer' }}>
-                      <Checkbox
-                        checked={state === 'complete' ? true : false}
-                        size="small"
-                        sx={{ color: 'white' }}
-                        color="default"
-                        onChange={() => handleChange(id, state, name)}
-                      />
-                    </Box>
+              {checkItem.map(({ id, name, state, idChecklist }) => {
+                if (checkListId === idChecklist) {
+                  return (
                     <Box
+                      key={id}
                       sx={{
-                        width: '100%',
-                        height: '100%',
-                        padding: '0.55rem 0.4rem',
-                        color: 'white',
-                        borderBottom: '1px solid rgba(255,255,255,1)',
+                        margin: '0.2rem 0rem',
+                        display: 'flex',
+                        borderRadius: '0.2rem',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
                       }}
                     >
-                      {name}
-                    </Box>
-                  </Box>
-                  <Box
-                    sx={{
-                      //   width: '10%',
-                      height: '100%',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
+                      <Box
+                        sx={{
+                          width: '90%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.2rem',
+                        }}
+                      >
+                        <Box sx={{ cursor: 'pointer' }}>
+                          <Checkbox
+                            checked={state === 'complete' ? true : false}
+                            size="small"
+                            sx={{ color: 'white' }}
+                            color="default"
+                            onChange={() => handleChange(id, state, name)}
+                          />
+                        </Box>
+                        <Box
+                          sx={{
+                            width: '100%',
+                            height: '100%',
+                            padding: '0.55rem 0.4rem',
+                            color: 'white',
+                            borderBottom: '1px solid rgba(255,255,255,1)',
+                          }}
+                        >
+                          {name}
+                        </Box>
+                      </Box>
+                      <Box
+                        sx={{
+                          //   width: '10%',
+                          height: '100%',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
 
-                      cursor: 'pointer',
-                      borderRadius: '0.5rem',
-                      padding: '0.2rem 0.2rem',
-                      backgroundColor: 'rgba(255,255,255,0.1)',
-                      '&:hover': {
-                        boxShadow: 'rgba(0, 0, 0, 0.24) 0px 3px 8px',
-                      },
-                    }}
-                    onClick={() => handleDeleteCheckItem(id)}
-                  >
-                    <RemoveCircleOutlineOutlinedIcon sx={{ color: 'white' }} />
-                  </Box>
-                </Box>
-              ))}
+                          cursor: 'pointer',
+                          borderRadius: '0.5rem',
+                          padding: '0.2rem 0.2rem',
+                          backgroundColor: 'rgba(255,255,255,0.1)',
+                          '&:hover': {
+                            boxShadow: 'rgba(0, 0, 0, 0.24) 0px 3px 8px',
+                          },
+                        }}
+                        onClick={() => handleDeleteCheckItem(id)}
+                      >
+                        <RemoveCircleOutlineOutlinedIcon
+                          sx={{ color: 'white' }}
+                        />
+                      </Box>
+                    </Box>
+                  );
+                }
+              })}
             </FormGroup>
             <Box sx={{ marginLeft: '3rem' }}>
               {open ? (

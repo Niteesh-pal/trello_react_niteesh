@@ -23,7 +23,9 @@ function List({ listId, name, handleArchive }) {
 
   useEffect(() => {
     getApiData(`/lists/${listId}/cards`, setCards, setLoading, setError);
+    // fetchData()
   }, []);
+
 
   const handleAddCard = async (userInput) => {
     if (userInput === '') {
@@ -33,7 +35,7 @@ function List({ listId, name, handleArchive }) {
       return alert('out of word limit');
     }
     const res = await postApiData(`/cards?name=${userInput}&idList=${listId}`);
-    
+
     if (res !== undefined) {
       setCards((data) => [...data, res]);
     }

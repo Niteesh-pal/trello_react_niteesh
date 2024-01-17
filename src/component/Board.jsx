@@ -1,22 +1,40 @@
 import { useEffect, useState } from 'react';
 
 import { Box } from '@mui/material';
-import { getApiData, postApiData } from '../ApiConfig/Api';
+import { fetchApiData, getApiData, postApiData } from '../ApiConfig/Api';
 import BoardCard from './Board/BoardCard';
 import OpenModal from './Modal/Modal';
 import CreateBoard from './Board/CreateBoard';
 import { Link } from 'react-router-dom';
 import Loading from './Loading/Loading';
 import Error from './Error/Error';
+import { useDispatch, useSelector } from 'react-redux';
+import { addBoard, setBoards } from '../app/Slices/BoardSlice';
 
 function Board() {
-  const [boards, setBoards] = useState([]);
+  // const [boards, setBoards] = useState([]);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
+  const dispatch = useDispatch();
+
+  const boards = useSelector((state) => state.board.board);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError(false);
+      const response = await fetchApiData('/members/me/boards');
+      dispatch(setBoards(response.data));
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
-    getApiData('/members/me/boards', setBoards, setLoading, setError);
+    fetchData();
   }, []);
 
   // console.log(boards);
@@ -26,20 +44,22 @@ function Board() {
   const handleClose = () => setOpen(false);
 
   const handleCreateBoard = async (userInput) => {
-    userInput.trim()
-    if(userInput === ""){
-      return alert("please provide title")
+    userInput.trim();
+    if (userInput === '') {
+      return alert('please provide title');
     }
     setOpen(false);
     const data = await postApiData(`/board?name=${userInput}`);
-    setBoards((board) => [...board, data]);
+    if(data){
+      dispatch(addBoard(data))
+    }
   };
 
   if (error) {
-    return <Error/>;
+    return <Error />;
   }
   if (loading) {
-    return<Loading/>
+    return <Loading />;
   }
   return (
     <>
