@@ -19,7 +19,12 @@ import {
   postApiData,
 } from '../../ApiConfig/Api';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteCheckItem, getData, setCheckItemCheckBox, setCheckItemData } from '../../app/Slices/checkItemSlice.js';
+import {
+  deleteCheckItem,
+  getData,
+  setCheckItemCheckBox,
+  setCheckItemData,
+} from '../../app/Slices/checkItemSlice.js';
 
 function CheckList({ name, checkListId, cardId, onDeleteChecklist }) {
   // const [checkItem, setCheckItem] = useState([]);
@@ -45,15 +50,10 @@ function CheckList({ name, checkListId, cardId, onDeleteChecklist }) {
   };
 
   useEffect(() => {
-    // getApiData(
-    //   `/checklists/${checkListId}/checkItems`,
-    //   setCheckItem,
-    //   setLoading,
-    //   setError
-    // );
-
     fetchData();
   }, []);
+  console.log(checkListId);
+  console.log(checkItem);
 
   const handleOpen = () => {
     setOpen(true);
@@ -66,12 +66,11 @@ function CheckList({ name, checkListId, cardId, onDeleteChecklist }) {
     if (userInput === '') {
       return alert('please enter title');
     }
+
     const res = await postApiData(
       `/checklists/${checkListId}/checkItems?name=${userInput}`
     );
     if (res) {
-      // setCheckItem((value) => [...value, res]);
-
       dispatch(setCheckItemData(res));
     }
   };
@@ -81,8 +80,8 @@ function CheckList({ name, checkListId, cardId, onDeleteChecklist }) {
       `/checklists/${checkListId}/checkItems/${itemId}`
     );
 
-    if(res){
-      dispatch(deleteCheckItem(itemId))
+    if (res) {
+      dispatch(deleteCheckItem(itemId));
     }
   };
 
@@ -103,21 +102,11 @@ function CheckList({ name, checkListId, cardId, onDeleteChecklist }) {
 
   const handleChange = async (checkItemId, state) => {
     const checkboxState = state === 'complete' ? 'incomplete' : 'complete';
-    // console.log(checkItemId, name,checkboxState)
     const res = await archiveApiData(
       `/cards/${cardId}/checkItem/${checkItemId}?state=${checkboxState}`
     );
-    // setCheckItem((data) => {
-    //   const newData = data.map((obj) => {
-    //     if (obj.id === res.id) {
-    //       obj.state = checkboxState;
-    //     }
-    //     return obj;
-    //   });
-    //   return newData;
-    // });
-    if(res){
-      dispatch(setCheckItemCheckBox({id:checkItemId,state:checkboxState}))
+    if (res) {
+      dispatch(setCheckItemCheckBox({ id: checkItemId, state: checkboxState }));
     }
   };
 

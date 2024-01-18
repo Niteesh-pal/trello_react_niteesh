@@ -1,16 +1,26 @@
 /* eslint-disable react/prop-types */
 import { Box, Button, LinearProgress } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { archiveApiData, getApiData, postApiData } from '../../ApiConfig/Api';
+import {
+  archiveApiData,
+  fetchApiData,
+  getApiData,
+  postApiData,
+} from '../../ApiConfig/Api';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Card from '../Card/Card';
 import EditInput from '../EditInput/EditInput';
 import Error from '../Error/Error';
+import { useDispatch, useSelector } from 'react-redux';
+import { setCards, addCards, deleteCard } from '../../app/Slices/cardSlice';
 
 function List({ listId, name, handleArchive }) {
-  const [cards, setCards] = useState([]);
+  // const [cards, setCards] = useState([]);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const dispatch = useDispatch();
+  const { cards } = useSelector((state) => state.cards);
 
   const [open, setOpen] = useState(false);
   const handleClick = () => {
@@ -21,9 +31,22 @@ function List({ listId, name, handleArchive }) {
     setOpen(false);
   };
 
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError(false);
+      const res = await fetchApiData(`/lists/${listId}/cards`);
+      dispatch(setCards(res.data));
+      setLoading(false);
+      setError(false);
+    } catch (error) {
+      setError(true);
+    }
+  };
+
   useEffect(() => {
-    getApiData(`/lists/${listId}/cards`, setCards, setLoading, setError);
-    // fetchData()
+    // getApiData(`/lists/${listId}/cards`, setCards, setLoading, setError);
+    fetchData();
   }, []);
 
 
@@ -37,7 +60,7 @@ function List({ listId, name, handleArchive }) {
     const res = await postApiData(`/cards?name=${userInput}&idList=${listId}`);
 
     if (res !== undefined) {
-      setCards((data) => [...data, res]);
+      dispatch(addCards(res));
     }
   };
 
@@ -45,8 +68,7 @@ function List({ listId, name, handleArchive }) {
     const res = await archiveApiData(`/cards/${cardId}?closed=true`);
 
     if (res) {
-      const newData = cards.filter(({ id }) => id !== cardId);
-      setCards(newData);
+      dispatch(deleteCard(cardId));
     }
   };
   if (error) {
@@ -124,14 +146,18 @@ function List({ listId, name, handleArchive }) {
           },
         }}
       >
-        {cards.map(({ id, name }) => (
-          <Card
-            key={id}
-            name={name}
-            cardId={id}
-            handleDelete={handleDeleteCard}
-          ></Card>
-        ))}
+        {cards.map(({ id, name, idList }) => {
+          if (listId === idList) {
+            return (
+              <Card
+                key={id}
+                name={name}
+                cardId={id}
+                handleDelete={handleDeleteCard}
+              ></Card>
+            );
+          }
+        })}
       </Box>
       <Box my={1}>
         {open ? (

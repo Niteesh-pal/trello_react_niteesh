@@ -60,11 +60,11 @@ function BoardDetail() {
     dispatch(toggleOpen(false));
   };
 
-  console.log('BoardDetails', lists);
+
 
   const handleArchive = async (listId) => {
     const res = await archiveApiData(`/lists/${listId}?closed=true`);
-    console.log(res);
+    
     if(res){
       dispatch(deleteList(listId))
     }

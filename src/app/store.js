@@ -3,7 +3,8 @@ import checkItemSlice from './Slices/checkItemSlice';
 import checkListSlice from './Slices/checkListSlice';
 import BoardSlice from './Slices/BoardSlice';
 import listSlice from './Slices/ListSlices';
-import cardSlice from './Slices/Card';
+import cardSlice from './Slices/cardSlice';
+
 
 const store = configureStore({
   reducer: {
