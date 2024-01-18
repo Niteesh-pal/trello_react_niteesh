@@ -1,16 +1,18 @@
 import api from '../ApiConfig/axiosConfig';
 
-const getApiData = async (url, setData, setLoading, setError) => {
-  try {
-    setLoading(true);
-    setError(false);
-    const response = await api.get(url);
-    setData(response.data);
-    setLoading(false);
-  } catch (error) {
-    setError(error);
-    setLoading(false);
-  }
+const getApiData =(url) => {
+  // try {
+  //   setLoading(true);
+  //   setError(false);
+  //   const response = await api.get(url);
+  //   setData(response.data);
+  //   setLoading(false);
+  // } catch (error) {
+  //   setError(error);
+  //   setLoading(false);
+  // }
+
+  return api.get(url)
 };
 
 const postApiData = async (url) => {

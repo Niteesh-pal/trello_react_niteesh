@@ -11,8 +11,8 @@ function List({ listId, name, handleArchive }) {
   const [cards, setCards] = useState([]);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
-
   const [open, setOpen] = useState(false);
+
   const handleClick = () => {
     setOpen(true);
   };
@@ -21,8 +21,22 @@ function List({ listId, name, handleArchive }) {
     setOpen(false);
   };
 
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError(false);
+      const res = await getApiData(`/lists/${listId}/cards`);
+      setCards(res.data);
+      setLoading(false);
+    } catch (error) {
+      setError(true);
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
-    getApiData(`/lists/${listId}/cards`, setCards, setLoading, setError);
+    // getApiData(`/lists/${listId}/cards`, setCards, setLoading, setError);
+    fetchData()
   }, []);
 
   const handleAddCard = async (userInput) => {
@@ -33,7 +47,7 @@ function List({ listId, name, handleArchive }) {
       return alert('out of word limit');
     }
     const res = await postApiData(`/cards?name=${userInput}&idList=${listId}`);
-    
+
     if (res !== undefined) {
       setCards((data) => [...data, res]);
     }

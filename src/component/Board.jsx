@@ -15,8 +15,23 @@ function Board() {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError(false);
+      const res = await getApiData('/members/me/boards');
+      setBoards(res.data);
+      setLoading(false);
+    } catch (error) {
+      setError(true);
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     getApiData('/members/me/boards', setBoards, setLoading, setError);
+
+    fetchData();
   }, []);
 
   // console.log(boards);
@@ -26,9 +41,9 @@ function Board() {
   const handleClose = () => setOpen(false);
 
   const handleCreateBoard = async (userInput) => {
-    userInput.trim()
-    if(userInput === ""){
-      return alert("please provide title")
+    userInput.trim();
+    if (userInput === '') {
+      return alert('please provide title');
     }
     setOpen(false);
     const data = await postApiData(`/board?name=${userInput}`);
@@ -36,10 +51,10 @@ function Board() {
   };
 
   if (error) {
-    return <Error/>;
+    return <Error />;
   }
   if (loading) {
-    return<Loading/>
+    return <Loading />;
   }
   return (
     <>

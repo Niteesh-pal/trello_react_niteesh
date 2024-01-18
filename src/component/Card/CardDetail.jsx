@@ -13,13 +13,22 @@ function CardDetail({ name, cardId }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError(false);
+      const res = await getApiData( `/cards/${cardId}/checklists`);
+      setCheckList(res.data);
+      setLoading(false);
+    } catch (error) {
+      setError(true);
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
-    getApiData(
-      `/cards/${cardId}/checklists`,
-      setCheckList,
-      setLoading,
-      setError
-    );
+    fetchData()
   }, []);
 
   const handleOpen = () => {

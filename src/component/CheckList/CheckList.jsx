@@ -24,13 +24,21 @@ function CheckList({ name, checkListId, cardId, onDeleteChecklist }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError(false);
+      const res = await getApiData(`/checklists/${checkListId}/checkItems`);
+      setCheckItem(res.data);
+      setLoading(false);
+    } catch (error) {
+      setError(true);
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
-    getApiData(
-      `/checklists/${checkListId}/checkItems`,
-      setCheckItem,
-      setLoading,
-      setError
-    );
+    fetchData();
   }, []);
 
   const handleOpen = () => {

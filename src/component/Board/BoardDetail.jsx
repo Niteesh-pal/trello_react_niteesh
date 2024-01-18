@@ -19,8 +19,22 @@ function BoardDetail() {
   const [error, setError] = useState(false);
   const [openAddList, setAddList] = useState(false);
 
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError(false);
+      const res = await getApiData(`/boards/${id}/lists`);
+      setLists(res.data);
+      setLoading(false);
+    } catch (error) {
+      setError(true);
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     getApiData(`/boards/${id}/lists`, setLists, setLoading, setError);
+    fetchData()
   }, []);
 
   const handleArchive = async (listId) => {
