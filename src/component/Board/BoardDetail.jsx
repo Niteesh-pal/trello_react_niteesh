@@ -13,7 +13,7 @@ import Error from '../Error/Error';
 function BoardDetail() {
   const { id } = useParams();
   const location = useLocation();
-  const boardName = location.state.boardName || '';
+  const boardName = location.state.boardName ? location.state.boardName : '';
   const [lists, setLists] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
