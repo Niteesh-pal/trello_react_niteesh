@@ -86,18 +86,22 @@ function CheckList({ name, checkListId, cardId, onDeleteChecklist }) {
   };
 
   const progressValue = () => {
-    if (checkItem.length === 0) {
+    const filteredCheckitems = checkItem.filter(
+      (item) => item.idChecklist === checkListId
+    );
+
+    if (filteredCheckitems.length === 0) {
       return 0;
     }
 
     let count = 0;
-    for (let key of checkItem) {
+    for (let key of filteredCheckitems) {
       if (key.state === 'complete') {
         count++;
       }
     }
 
-    return Math.floor(((count / checkItem.length) * 100).toFixed(2));
+    return Math.floor(((count / filteredCheckitems.length) * 100).toFixed(2));
   };
 
   const handleChange = async (checkItemId, state) => {

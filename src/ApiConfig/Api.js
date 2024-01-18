@@ -18,7 +18,7 @@ const postApiData = async (url) => {
     const response = await api.post(url);
     return response.data;
   } catch (error) {
-    alert("something went Wrong")
+    alert('something went Wrong');
   }
 };
 
@@ -27,27 +27,20 @@ const archiveApiData = async (url) => {
     const response = await api.put(url);
     return response.data;
   } catch (error) {
-    alert("Something went wrong")
+    alert('Something went wrong');
   }
 };
 const deleteApiData = async (url) => {
   try {
     const response = await api.delete(url);
-    // console.log(response)
-    // if (response) {
-    //   setData((data) => {
-    //     const newdata = data.filter(({ id }) => id !== checkListId);
-    //     return newdata;
-    //   });
-    // }
     return response.data;
   } catch (error) {
     alert('error occurred');
   }
 };
 
-const fetchApiData = (url)=>{
-  return api.get(url)
-}
+const fetchApiData = (url) => {
+  return api.get(url);
+};
 
-export { getApiData, postApiData, archiveApiData, deleteApiData ,fetchApiData};
+export { getApiData, postApiData, archiveApiData, deleteApiData, fetchApiData };
