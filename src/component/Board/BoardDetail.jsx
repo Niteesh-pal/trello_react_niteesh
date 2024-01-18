@@ -13,7 +13,7 @@ import Error from '../Error/Error';
 function BoardDetail() {
   const { id } = useParams();
   const location = useLocation();
-  const { boardName } = location.state;
+  const boardName = location.state.boardName || '';
   const [lists, setLists] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -34,7 +34,7 @@ function BoardDetail() {
 
   useEffect(() => {
     getApiData(`/boards/${id}/lists`, setLists, setLoading, setError);
-    fetchData()
+    fetchData();
   }, []);
 
   const handleArchive = async (listId) => {
